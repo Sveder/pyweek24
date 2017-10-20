@@ -3,6 +3,7 @@ import pygame
 import data
 import parallax
 
+import coins
 from config import *
 from platforms import Platform, Trampoline
 
@@ -65,4 +66,6 @@ class Level_01(Level):
         trampoline.rect.x = 400
         trampoline.rect.y = GROUND_HEIGHT - 3
         self.level_elements.add(trampoline)
+
+        self.level_elements.add(coins.Coin((400, GROUND_HEIGHT - 100)))
 

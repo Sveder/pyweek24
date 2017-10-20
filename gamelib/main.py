@@ -4,21 +4,24 @@ import pygame
 from config import *
 from levels import Level_01
 from player import Player
+import coins
 import platforms
 import shmuel
 
+DEBUG = False
 
 class Game:
     def __init__(self):
         pygame.display.set_caption("MetaPyWeek 24#")
         self.screen = pygame.display.set_mode((SCREEN_WIDTH, SCREEN_HEIGHT))
 
+        self.font = pygame.font.SysFont("monospace", 15)
+
         self.player = Player()
         self.level_list = [Level_01(self.player)]
 
         current_level_no = 0
         self.current_level = self.level_list[current_level_no]
-
         self.active_sprite_list = pygame.sprite.Group()
 
         self.player.rect.x = 140
@@ -34,6 +37,7 @@ class Game:
         # Used to manage how fast the screen updates
         self.clock = pygame.time.Clock()
 
+        self.coins = 0
 
     def run(self):
         while not self.should_quit:
@@ -73,6 +77,10 @@ class Game:
                 elif isinstance(element, platforms.Trampoline):
                     self.player.jump()
 
+                elif isinstance(element, coins.Coin):
+                    self.current_level.level_elements.remove(element)
+                    self.coins += element.coin_value
+
             self.active_sprite_list.update()
             self.current_level.update()
             self.shmuel.update()
@@ -90,11 +98,12 @@ class Game:
                 self.current_level.shift_world(diff)
 
             #DRAW HERE:
-
             self.current_level.draw(self.screen)
             self.active_sprite_list.draw(self.screen)
 
             self.screen.blit(self.shmuel.image, self.shmuel.rect)
+            label = self.font.render("Coins: %s" % self.coins, True, (255, 255, 0))
+            self.screen.blit(label, (SCREEN_WIDTH / 2, 20))
 
             new_rays = []
             for obj, percent in self.active_rays:
@@ -111,7 +120,10 @@ class Game:
             self.active_rays = new_rays
 
             dt = self.clock.tick(60)
-            print "Frame took: %s" % dt
+
+            if DEBUG:
+                print "Frame took: %s" % dt
+
             pygame.display.flip()
 
 
