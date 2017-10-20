@@ -68,4 +68,5 @@ class Level_01(Level):
         self.level_elements.add(trampoline)
 
         self.level_elements.add(coins.Coin((400, GROUND_HEIGHT - 100)))
+        self.level_elements.add(coins.Coin((800, 350)))
 

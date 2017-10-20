@@ -22,6 +22,7 @@ class Game:
 
         current_level_no = 0
         self.current_level = self.level_list[current_level_no]
+        self.player.level = self.current_level
         self.active_sprite_list = pygame.sprite.Group()
 
         self.player.rect.x = 140
@@ -37,7 +38,7 @@ class Game:
         # Used to manage how fast the screen updates
         self.clock = pygame.time.Clock()
 
-        self.coins = 0
+        self.coin_count = 0
 
     def run(self):
         while not self.should_quit:
@@ -67,19 +68,14 @@ class Game:
 
                     self.active_rays.append((new_tramp, 255))
 
+
             collided = pygame.sprite.spritecollide(self.player,
                                                    self.current_level.level_elements,
                                                    False)
             for element in collided:
-                if isinstance(element, platforms.Platform):
-                    self.player.rect.right = element.rect.left
-
-                elif isinstance(element, platforms.Trampoline):
-                    self.player.jump()
-
-                elif isinstance(element, coins.Coin):
+                if isinstance(element, coins.Coin):
                     self.current_level.level_elements.remove(element)
-                    self.coins += element.coin_value
+                    self.coin_count += element.coin_value
 
             self.active_sprite_list.update()
             self.current_level.update()
@@ -102,7 +98,7 @@ class Game:
             self.active_sprite_list.draw(self.screen)
 
             self.screen.blit(self.shmuel.image, self.shmuel.rect)
-            label = self.font.render("Coins: %s" % self.coins, True, (255, 255, 0))
+            label = self.font.render("Coins: %s" % self.coin_count, True, THECOLORS["brown"])
             self.screen.blit(label, (SCREEN_WIDTH / 2, 20))
 
             new_rays = []
