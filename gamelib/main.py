@@ -1,20 +1,20 @@
+from pygame.colordict import THECOLORS
 import pygame
 
 from config import *
 from levels import Level_01
 from player import Player
 import platforms
+import shmuel
 
 
 class Game:
     def __init__(self):
-        self.player = Player()
         self.screen = None
 
-        # Create all the levels
+        self.player = Player()
         self.level_list = [Level_01(self.player)]
 
-        # Set the current level
         current_level_no = 0
         self.current_level = self.level_list[current_level_no]
 
@@ -23,6 +23,10 @@ class Game:
         self.player.rect.x = 140
         self.player.rect.y = GROUND_HEIGHT - self.player.rect.height
         self.active_sprite_list.add(self.player)
+
+        self.active_rays = []
+
+        self.shmuel = shmuel.Shmuel()
 
         self.should_quit = False
 
@@ -54,6 +58,13 @@ class Game:
                     if event.key == pygame.K_RIGHT and self.player.change_x > 0:
                         self.player.stop()
 
+                if event.type == pygame.MOUSEBUTTONUP:
+                    new_tramp = platforms.Trampoline()
+                    new_tramp.rect.center = event.pos
+                    self.current_level.level_elements.add(new_tramp)
+
+                    self.active_rays.append((new_tramp, 255))
+
             collided = pygame.sprite.spritecollide(self.player,
                                                    self.current_level.level_elements,
                                                    False)
@@ -65,9 +76,8 @@ class Game:
                     self.player.jump()
 
             self.active_sprite_list.update()
-
-            # Update items in the level
             self.current_level.update()
+            self.shmuel.update()
 
             # If the player gets near the right side, shift the world left (-x)
             if self.player.rect.right >= 500:
@@ -83,6 +93,22 @@ class Game:
 
             self.current_level.draw(self.screen)
             self.active_sprite_list.draw(self.screen)
+
+            self.screen.blit(self.shmuel.image, self.shmuel.rect)
+
+            new_rays = []
+            for obj, percent in self.active_rays:
+                pygame.draw.line(
+                    self.screen,
+                    pygame.Color(255, 0, 0, percent),
+                    self.shmuel.rect.bottomleft,
+                    obj.rect.topright,
+                    4
+                )
+                if percent > 0:
+                    new_rays.append((obj, percent - 1))
+
+            self.active_rays = new_rays
 
             self.clock.tick(60)
             pygame.display.flip()

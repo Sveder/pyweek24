@@ -1,5 +1,4 @@
 import pygame
-from config import *
 
 import data
 
@@ -17,11 +16,10 @@ class Player(pygame.sprite.Sprite):
         self.change_y = 0
 
     def update(self):
-        # Move left/right
         self.rect.x += self.change_x
 
-        self.rect.y -= self.change_y
         self.change_y = max(0, self.change_y - 1)
+        self.rect.y -= self.change_y
 
     def jump(self):
         self.change_y = 20
