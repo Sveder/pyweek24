@@ -10,7 +10,8 @@ import shmuel
 
 class Game:
     def __init__(self):
-        self.screen = None
+        pygame.display.set_caption("MetaPyWeek 24#")
+        self.screen = pygame.display.set_mode((SCREEN_WIDTH, SCREEN_HEIGHT))
 
         self.player = Player()
         self.level_list = [Level_01(self.player)]
@@ -33,11 +34,8 @@ class Game:
         # Used to manage how fast the screen updates
         self.clock = pygame.time.Clock()
 
+
     def run(self):
-        pygame.display.set_caption("MetaPyWeek 24#")
-
-        self.screen = pygame.display.set_mode((SCREEN_WIDTH, SCREEN_HEIGHT))
-
         while not self.should_quit:
             for event in pygame.event.get():
                 if event.type == pygame.QUIT:
@@ -91,6 +89,8 @@ class Game:
                 self.player.rect.left = 120
                 self.current_level.shift_world(diff)
 
+            #DRAW HERE:
+
             self.current_level.draw(self.screen)
             self.active_sprite_list.draw(self.screen)
 
@@ -110,7 +110,8 @@ class Game:
 
             self.active_rays = new_rays
 
-            self.clock.tick(60)
+            dt = self.clock.tick(60)
+            print "Frame took: %s" % dt
             pygame.display.flip()
 
 

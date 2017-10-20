@@ -1,21 +1,23 @@
 import pygame
 
 import data
+import parallax
 
 from config import *
 from platforms import Platform, Trampoline
 
 
 class Level(object):
-    def __init__(self, player, bg="bg.jpg"):
+    def __init__(self, player):
         self.level_elements = pygame.sprite.Group()
 
         self.player = player
 
-        self.bg = data.load_image(bg)
-        bg_width = max(self.bg.get_rect().width, SCREEN_WIDTH)
-        bg_height = max(self.bg.get_rect().height, SCREEN_HEIGHT)
-        self.bg = pygame.transform.scale(self.bg, (bg_width, bg_height))
+        self.bg = parallax.ParallaxSurface((SCREEN_WIDTH, SCREEN_HEIGHT), pygame.RLEACCEL)
+        self.bg.add(data.filepath('backgrounds/sky.jpg'), 7)
+        self.bg.add(data.filepath('backgrounds/back_buildings.png'), 5)
+        self.bg.add(data.filepath('backgrounds/front_buildings.png'), 3)
+        self.bg.add(data.filepath('backgrounds/ground.png'), 1)
 
         # How far this world has been scrolled left/right
         self.world_shift = 0
@@ -25,12 +27,14 @@ class Level(object):
         self.level_elements.update()
 
     def draw(self, screen):
-        screen.blit(self.bg, (self.world_shift, 0))
+        self.bg.draw(screen)
+
         self.level_elements.draw(screen)
 
     def shift_world(self, shift_x):
         # Keep track of the shift amount
         self.world_shift += shift_x
+        self.bg.scroll(-shift_x, "horizontal")
 
         # Go through all the sprite lists and shift
         for platform in self.level_elements:
